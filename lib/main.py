@@ -15,11 +15,20 @@ def main(pods_path: str, spec_path: str, pod_names: []):
     try:
         podspec_list: [PodspecModel] = PodspecHelper.get_pod_versions(pods_path, pod_names)
         for item in podspec_list:
+            item.stspec_path = PodspecHelper.find_stspec_path(spec_path, item.name)
+
+            if item.stspec_path is None:
+                user_input = input(f'The {item.get_name_without_suffix()} STSpec folder was not find, want to '
+                                   f'create it? (Y/N) ')
+
+                if user_input.lower() in ['yes', 'y']:
+                    PodspecHelper.create_folder(spec_path, item.get_name_without_suffix())
+                    item.stspec_path = PodspecHelper.find_stspec_path(spec_path, item.name)
+                else:
+                    continue
+
             print(f'Current version of {item.name} -> {item.version}')
             item.version = input(f'Version to which you want to change the {item.name} -> ')
-
-            item.stspec_path = spec_path
-            item.stspec_path = PodspecHelper.find_stspec_path(item.stspec_path, item.name)
 
             if not PodspecHelper.create_folder(item.stspec_path, item.version):
                 print('This version already exists in the STSpec.')
@@ -44,8 +53,8 @@ def validate_file(filename):
 
 if __name__ == '__main__':
 
-    # ASCII_art = pyfiglet.figlet_format("VersionAutomator", font='graffiti', width=120)
-    # print(ASCII_art)
+    # Generate README art
+    # pyfiglet.figlet_format("VersionAutomator", font='graffiti', width=120)
 
     parser = argparse.ArgumentParser(description='Foo')
     parser.add_argument("-pP", "--pods-path", dest='podsPath', help="path to your pods folder",
