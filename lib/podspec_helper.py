@@ -18,6 +18,8 @@ class PodspecHelper:
             if pod_name in dir_names:
                 return os.path.join(dir_path, pod_name)
 
+        return None
+
     @staticmethod
     def create_folder(folder_path: str, folder_name: str) -> bool:
         complete_folder_path = os.path.join(folder_path, folder_name)
